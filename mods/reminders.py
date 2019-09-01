@@ -46,7 +46,7 @@ class RemindMe(commands.Cog):
         seconds = self.units[time_unit] * quantity
         future = int(time.time()+seconds)
         time_now = datetime.datetime.now()
-        self.reminders.append({"ID" : who.id, "AUTHOR" : author.id, "FUTURE" : future, "TEXT" : text, "SET" : time_now.strftime("%d/%m/%Y %H:%M:%S")})
+        self.reminders.append({"ID" : who.id, "AUTHOR" : author.id, "FUTURE" : future, "TEXT" : text, "SET" : time_now.strftime("%d/%m/%Y, %I:%M:%S%p")})
         logger.info("{} ({}) set a reminder for {} ({}).".format(author.name, author.id, who.name, who.id))
         await ctx.send("I will remind {} of that in {} {}.".format(who.name, str(quantity), time_unit + s))
         fileIO("data/reminders.json", "save", self.reminders)
