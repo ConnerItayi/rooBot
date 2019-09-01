@@ -3,12 +3,16 @@ Script for reminders, all credit for this script goes to Twentysix26
 https://github.com/Twentysix26/26-Cogs/blob/master/remindme/remindme.py
 '''
 import discord
+import datetime
+from datetime import date
 from discord.ext import commands
 from utils.dataIO import fileIO
 import os
 import asyncio
 import time
 import logging
+import utils
+from utils.embed import Embeds
 
 class RemindMe(commands.Cog):
     """Never forget anything anymore."""
@@ -41,7 +45,8 @@ class RemindMe(commands.Cog):
             return
         seconds = self.units[time_unit] * quantity
         future = int(time.time()+seconds)
-        self.reminders.append({"ID" : who.id, "AUTHOR" : author.id, "FUTURE" : future, "TEXT" : text})
+        time_now = datetime.datetime.now()
+        self.reminders.append({"ID" : who.id, "AUTHOR" : author.id, "FUTURE" : future, "TEXT" : text, "SET" : time_now.strftime("%d/%m/%Y %H:%M:%S")})
         logger.info("{} ({}) set a reminder for {} ({}).".format(author.name, author.id, who.name, who.id))
         await ctx.send("I will remind {} of that in {} {}.".format(who.name, str(quantity), time_unit + s))
         fileIO("data/reminders.json", "save", self.reminders)
@@ -67,6 +72,27 @@ class RemindMe(commands.Cog):
         else:
             await ctx.send("You don't have any upcoming notification.")
 
+    @commands.command(pass_context=True)
+    async def reminders(self, ctx):
+        """List all your upcoming reminders"""
+        author = ctx.message.author
+        reminders = []
+
+        for reminder in self.reminders:
+            if reminder["ID"] == author.id:
+                reminders.append(reminder)
+            else:
+                pass
+
+        if not reminders:
+            emb = Embeds.create_embed(self, ctx, 'Reminders', 0xe74c3c, 'You have no upcoming reminders!')
+        else:
+            emb = discord.Embed(title='Reminders', colour=0x206694)
+            for a, b in enumerate(reminders, 1):
+                emb.add_field(name="#{}".format(a), value='{} set {}'.format(b["TEXT"], b["SET"]), inline=False)
+
+        await ctx.send(embed=emb)
+        
     async def check_reminders(self):
         while self is self.bot.get_cog("RemindMe"):
             to_remove = []
