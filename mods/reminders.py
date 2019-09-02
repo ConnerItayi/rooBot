@@ -3,6 +3,7 @@ Script for reminders, all credit for this script goes to Twentysix26
 https://github.com/Twentysix26/26-Cogs/blob/master/remindme/remindme.py
 '''
 import discord
+import typing
 import datetime
 from datetime import date
 from discord.ext import commands
@@ -23,7 +24,7 @@ class RemindMe(commands.Cog):
         self.units = {"second" : 1,"minute": 60, "hour": 3600, "day": 86400, "week": 604800, "month": 2592000, "year": 31104000}
 
     @commands.command(pass_context=True)
-    async def remind(self, ctx, who : discord.User, quantity : int, time_unit : str, *, text : str):
+    async def remind(self, ctx, who : typing.Optional[str], quantity : int, time_unit : str, *, text : str):
         """Sends you <text> when the time is up
         Accepts: minutes, hours, days, weeks, month
         Example:
@@ -31,6 +32,11 @@ class RemindMe(commands.Cog):
         time_unit = time_unit.lower()
         author = ctx.message.author
         s = ""
+        if who:
+            if who == 'me':
+                who = author
+        if not who:
+            who = author
         if time_unit.endswith("s"):
             time_unit = time_unit[:-1]
             s = "s"
@@ -52,17 +58,27 @@ class RemindMe(commands.Cog):
         fileIO("data/reminders.json", "save", self.reminders)
 
     @commands.command(pass_context=True)
-    async def unremind(self, ctx, who:discord.User=None):
+    async def unremind(self, ctx, target:typing.Optional[int], who:typing.Optional[discord.User]):
         """Removes all your upcoming notifications"""
         author = ctx.message.author
         to_remove = []
         for reminder in self.reminders:
-            if who == None:
-                if reminder["ID"] == author.id:
-                    to_remove.append(reminder)
+            if not target:
+                if who == None:
+                    if reminder["ID"] == author.id:
+                        to_remove.append(reminder)
+                else:
+                    if reminder["ID"] == who.id:
+                        to_remove.append(reminder)
             else:
-                if reminder ["ID"] == who.id:
-                    to_remove.append(reminder)
+                if who == None:
+                    for a, b in enumerate(reminder, 1):
+                        if target == a and reminder["ID"] == author.id:
+                            to_remove.append(reminder)
+                else:
+                    for a, b in enumerate(reminder, 1):
+                        if reminder["ID"] == who.id == target == a:
+                            to_remove.append(reminder)
 
         if not to_remove == []:
             for reminder in to_remove:
@@ -73,23 +89,34 @@ class RemindMe(commands.Cog):
             await ctx.send("You don't have any upcoming notification.")
 
     @commands.command(pass_context=True)
-    async def reminders(self, ctx):
+    async def reminders(self, ctx, who: discord.User=None):
         """List all your upcoming reminders"""
         author = ctx.message.author
         reminders = []
 
         for reminder in self.reminders:
-            if reminder["ID"] == author.id:
-                reminders.append(reminder)
+            if who == None:
+                if reminder["ID"] == author.id:
+                    reminders.append(reminder)
             else:
-                pass
+                if reminder["ID"] == who.id:
+                    reminders.append(reminder)
 
         if not reminders:
-            emb = Embeds.create_embed(self, ctx, 'Reminders', 0xe74c3c, 'You have no upcoming reminders!')
+            if not who:
+                emb = Embeds.create_embed(self, ctx, 'Reminders', 0xe74c3c, 'You have no upcoming reminders!')
+            else:
+                emb = Embeds.create_embed(self, ctx, 'No upcoming rmeinders for {}'.format(who.name), 0xe74c3c, 'You have no upcoming reminders!')
         else:
-            emb = discord.Embed(title='Reminders', colour=0x206694)
-            for a, b in enumerate(reminders, 1):
-                emb.add_field(name="#{}".format(a), value='{} set {}'.format(b["TEXT"], b["SET"]), inline=False)
+            if not who:
+                emb = discord.Embed(title='Reminders', colour=0x206694)
+                for a, b in enumerate(reminders, 1):
+                    emb.add_field(name="#{}".format(a), value='{}\nset {}'.format(b["TEXT"], b["SET"]), inline=False)
+            else:
+                emb = discord.Embed(title='Reminders for {}'.format(who.name), colour=0x206694)
+                for a, b in enumerate(reminders, 1):
+                    emb.add_field(name="#{}".format(a), value='{}\nset {} by {}'.format(b["TEXT"], b["SET"], b["AUTHOR"]), inline=False)
+
 
         await ctx.send(embed=emb)
         

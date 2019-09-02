@@ -10,3 +10,4 @@ mods/memberEvents.py
 mods/manbot.py
 mods/info.py
 mods/info.py
+*.py
