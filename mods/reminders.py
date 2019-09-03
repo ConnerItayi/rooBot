@@ -37,6 +37,7 @@ class RemindMe(commands.Cog):
                 who = author
         if not who:
             who = author
+            
         if time_unit.endswith("s"):
             time_unit = time_unit[:-1]
             s = "s"

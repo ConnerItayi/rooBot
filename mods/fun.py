@@ -237,6 +237,23 @@ class Fun(commands.Cog):
         emb.set_image(url=result)
         await ctx.send(embed=emb)
 
+    @commands.command(name='snuggle')
+    async def snugglecmd(self, ctx, *, user:str=None):
+        result = random.choice(self.cuddle)
+        if user:
+            if user[0:2] == "<@" and user[-1] == ">":
+                user = int(re.sub("[^0-9]", "", user))
+                user = self.bot.get_user(user)
+                user = user.name
+            else:
+                pass
+        else:
+            user = ctx.message.author.name
+        emb = Embeds.create_embed(self, ctx, "Snuggling {}".format(user), 0x00aaff)
+        emb.set_image(url=result)
+        await ctx.send(embed=emb)
+
+
     @commands.command(name="hug")
     async def hugcmd(self, ctx, *, user:str=None):
         result = random.choice(self.hug)
