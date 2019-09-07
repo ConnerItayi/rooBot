@@ -72,6 +72,7 @@ class RemindMe(commands.Cog):
             for reminder in self.reminders:
                 if reminder["AUTHOR"] == ctx.message.author.id:
                     to_remove.append(reminder)
+
         if not to_remove == []:
             for reminder in to_remove:
                 self.reminders.remove(reminder)
@@ -91,11 +92,12 @@ class RemindMe(commands.Cog):
 
         for reminder in self.reminders:
             if who == None:
-                if reminder["WHO_ID"] == author.id:
+                if reminder["AUTHOR"] == author.id:
                     reminders.append(reminder)
             else:
                 if reminder["WHO_ID"] == who.id:
                     reminders.append(reminder)
+
 
         if not reminders:
             if not who:
