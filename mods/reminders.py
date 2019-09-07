@@ -54,19 +54,19 @@ class RemindMe(commands.Cog):
         seconds = self.units[time_unit] * quantity
         future = int(time.time()+seconds)
         time_now = datetime.datetime.now()
-        self.reminders.append({"ID" : hash(str(ctx.message.id)[:4]), "WHO_ID" : who.id, "AUTHOR" : author.id, "FUTURE" : future, "TEXT" : text, "SET" : time_now.strftime("%d/%m/%Y, %I:%M:%S%p")})
+        self.reminders.append({"WHO_ID" : who.id, "AUTHOR" : author.id, "FUTURE" : future, "TEXT" : text, "SET" : time_now.strftime("%d/%m/%Y, %I:%M:%S%p")})
         logger.info("{} ({}) set a reminder for {} ({}).".format(author.name, author.id, who.name, who.id))
         await ctx.send("I will remind {} of that in {} {}.".format(who.name, str(quantity), time_unit + s))
         fileIO("data/reminders.json", "save", self.reminders)
 
     @commands.command(pass_context=True)
-    async def unremind(self, ctx, target: str=None):
-        """Removes all your upcoming notifications"""
+    async def unremind(self, ctx, target: int=None):
+        """Removes all your upcoming notifications, or one."""
         author = ctx.message.author
         to_remove = []
         if target:
-            for reminder in self.reminders:
-                if reminder["ID"] == target and reminder["AUTHOR"] == ctx.message.author.id:
+            for a, reminder in enumerate(self.reminders, 1):
+                if target == a and reminder["AUTHOR"] == ctx.message.author.id:
                     to_remove.append(reminder)
         else:
             for reminder in self.reminders:
@@ -106,7 +106,7 @@ class RemindMe(commands.Cog):
             if not who:
                 emb = discord.Embed(title='Reminders', colour=0x206694)
                 for a, b in enumerate(reminders, 1):
-                    emb.add_field(name="#{}".format(a), value='{}(ID:{})\nset {}'.format(b["TEXT"], b["ID"], b["SET"]), inline=False)
+                    emb.add_field(name="#{}".format(a), value='{}\nset {}'.format(b["TEXT"], b["SET"]), inline=False)
             else:
                 emb = discord.Embed(title='Reminders for {}'.format(who.name), colour=0x206694)
                 for a, b in enumerate(reminders, 1):
