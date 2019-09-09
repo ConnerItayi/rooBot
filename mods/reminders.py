@@ -3,7 +3,6 @@ Script for reminders, all credit for this script goes to Twentysix26
 https://github.com/Twentysix26/26-Cogs/blob/master/remindme/remindme.py
 '''
 import discord
-import typing
 import datetime
 from datetime import date
 from discord.ext import commands
