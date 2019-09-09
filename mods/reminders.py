@@ -14,7 +14,6 @@ import time
 import logging
 import utils
 from utils.embed import Embeds
-from typing import Optional, Union
 
 class RemindMe(commands.Cog):
     """Never forget anything anymore."""
