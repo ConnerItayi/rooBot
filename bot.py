@@ -26,7 +26,6 @@ class bot(commands.Bot):
         self.last_message = None
         self.command_messages = {}
         self.messages_seen = 0
-        self.remove_command('help')
     
     async def on_message(self, ctx):
         self.messages_seen += 1
