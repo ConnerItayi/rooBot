@@ -1,6 +1,8 @@
 import discord
 import random
 import requests
+import aiohttp
+import os
 from discord.ext import commands
 from utils.dataIO import fileIO
 from utils.embed import Embeds
@@ -456,6 +458,31 @@ class Fun(commands.Cog):
         else:
             user = ctx.message.author.name
         emb = Embeds.create_embed(self, ctx, "{} kills {} via {}".format(ctx.message.author, user, final_kill_method))
+        await ctx.send(embed=emb)
+
+
+    @command(db_name='urban',
+             pattern='!urban (.*)',
+             db_check=True,
+             usage="!urban dank_word")
+    async def urban(self, message, args):
+        search = args[0]
+        url = "http://api.urbandictionary.com/v0/define"
+        with aiohttp.ClientSession() as session:
+            async with session.get(url, params={"term": search}) as resp:
+                data = await resp.json()
+
+        if data["list"]:
+            entry = data["list"][0]
+            emb = Embeds.create_embed(self, ctx, "Urban Dictionary", None, None)
+            emb.add_field(name="Search", value="**{e[word]}**, inline=True)
+            emb.add_field(name="Result", value=**{e[definition]}**, inline=True)
+            emb.add_field(name="Example", value=**{e[example]}**, inline=True)
+        else:
+            emb = Embeds.create_embed(self, ctx, "Error!", None, None)
+            emb.add_field(name="Search Error", value="I couldn't find anything for **{e[word]}. I'm so sorry!", inline=True)
+        emb.set_footer(text="Requested by {0}".format(ctx.message.author), icon_url=ctx.message.author.avatar_url)
+        emb.timestamp = ctx.message.created_at
         await ctx.send(embed=emb)
 
 def setup(bot):
