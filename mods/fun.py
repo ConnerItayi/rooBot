@@ -150,6 +150,19 @@ class Fun(commands.Cog):
         'https://s-media-cache-ak0.pinimg.com/originals/69/fc/82/69fc828893e612d86fc7bb85862be96e.gif', 'http://25.media.tumblr.com/c65a4af4ff032d1ca06350b66a1e819c/tumblr_mtxk6zVzaa1sogk1do1_r1_500.gif', 
         'http://media.giphy.com/media/ROF8OQvDmxytW/giphy.gif', 'http://media.giphy.com/media/QUKkvRTIYLgMo/giphy.gif', 'http://media.tumblr.com/tumblr_mdaindozZF1ryvbtl.gif', 
         'https://31.media.tumblr.com/b307cca19d29eb1625bd841e661c0f59/tumblr_mvjhgmknl91stfs7go1_500.gif', 'http://media1.giphy.com/media/4pk6ba2LUEMi4/giphy.gif']
+        
+       #
+       self.filt = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890$-_.+!*'(),"
+       
+       #
+       def url_encode(word):
+	url = ""
+	for c in word:
+		if c not in filt:
+			url += "%" +  str(hex(ord(c))).replace("0x", "")
+		else:
+			url += c
+	return url
 
     @commands.command(name='pay')
     async def payuser(self, ctx, who:discord.User=None, amount=None):
@@ -461,12 +474,12 @@ class Fun(commands.Cog):
         await ctx.send(embed=emb)
 
 
-    @command(db_name='urban',
-             pattern='!urban (.*)',
-             db_check=True,
-             usage="!urban dank_word")
-    async def urban(self, message, args):
-        search = args[0]
+    @command(name='urban',
+             description= "search urban dictionary for definitions",
+             brief = "Search Urban Dictionary",
+             aliases= ['ud'])
+    async def urban(self, ctx, *, word: str=None):
+        search = word[0]
         url = "http://api.urbandictionary.com/v0/define"
         with aiohttp.ClientSession() as session:
             async with session.get(url, params={"term": search}) as resp:
@@ -484,6 +497,18 @@ class Fun(commands.Cog):
         emb.set_footer(text="Requested by {0}".format(ctx.message.author), icon_url=ctx.message.author.avatar_url)
         emb.timestamp = ctx.message.created_at
         await ctx.send(embed=emb)
+
+    @command(name="ascii",
+             description='Convert your text to ascii art!',
+             brief="Ascii art"
+)
+    async def ascii(self, ctx, *, text: str=None):
+    url = "http://artii.herokuapp.com/make?text="
+		if text:
+		    word = url_encode(text)
+		response = urllib.request.urlopen('http://artii.herokuapp.com/make?text=' + word)
+		text = str(response.read())
+    await ctx.send('```%s```' % text)
 
 def setup(bot):
     bot.add_cog(Fun(bot))
