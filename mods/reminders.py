@@ -36,8 +36,8 @@ class RemindMe(commands.Cog):
                 who = author
         else:
             if who[0:2] == "<@" and who[-1] == ">":
-                user = int(re.sub("[^0-9]", "", who))
-                who = self.bot.get_user(user)
+                who = int(re.sub("[^0-9]", "", who))
+                who = self.bot.get_user(who)
                 who = user.name
         if not who:
             who = author
