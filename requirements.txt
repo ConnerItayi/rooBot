@@ -1,5 +1,7 @@
-git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py
+discord.py
 aiohttp
 python-mpd2
 requests
 psutil
+osuapi
+pushbullet.py

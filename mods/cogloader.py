@@ -5,26 +5,26 @@ import aiohttp
 from discord import Game
 from discord.ext import commands
 from discord.ext.commands import Bot
-from config import emotes
-from utils import checks
 from utils.config import Config
-from utils.cog import Cog
+from utils.embed import Embeds
 
-class CogLoader(Cog):
+class CogLoader(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
     @commands.group(name='cog',
                     description="Command for Cog management.",
                     brief="Command for Cog management.")
-    @checks.is_owner()
+    @commands.is_owner()
     async def cog(self, ctx):
         if ctx.invoked_subcommand is None:
-            emb = discord.Embed()
-            emb.title = "Cog Loader " + emotes.Warn
-            emb.colour = 0xffff00
-            emb.description = "Please issue a subcommand!\nAvailable options are:"
-            emb.add_field(name="Load", value="Load a module.", inline=False)
-            emb.add_field(name="Reload", value="Reload a module.", inline=False)
-            emb.add_field(name="Unload", value="Unload a module that you've manually loaded.\nModules in `config.py` will stay loaded.", inline=False)
-            emb.add_field(name="List", value="List all loaded cogs.", inline=False)
+            emb = Embeds.create_embed(self, ctx,
+            "Cog Loader",
+            0xffff00,
+            "Please issue a valid subcommand!\nAvailable options are:",
+            Com1 = ["load", "Loads a cog into the bot.", False],
+            Com2 = ["unload", "Unloads a cog loaded into the bot.", False],
+            Com3 = ["reload", "Reloads a cog loaded into the bot.", False],
+            Com4 = ["list", "Lists all cogs loaded into the bot."])
             await ctx.message.channel.send(embed=emb)
 
     @cog.command(name='load',
@@ -52,6 +52,11 @@ class CogLoader(Cog):
         cog = "mods." + mod
         emb = discord.Embed()
         emb.title = "Cog Loader"
+        if mod.lower() == "cogloader":
+            emb.description = "Unable to unload Cog Loader."
+            emb.colour = 0xff0000
+            await ctx.message.channel.send(embed=emb)
+            return
         try:
             self.bot.unload_extension(cog)
             emb.description = "Unloaded cog `" + mod + "` successfully"
