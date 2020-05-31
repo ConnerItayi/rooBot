@@ -158,7 +158,13 @@ class Fun(commands.Cog):
        def url_encode(word):
 	url = ""
 	for c in word:
+
 		if c not in self.filt:
+
+
+
+
+
 			url += "%" +  str(hex(ord(c))).replace("0x", "")
 		else:
 			url += c
