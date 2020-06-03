@@ -28,10 +28,14 @@ class bot(commands.Bot):
         self.command_messages = {}
         self.messages_seen = 0
         self.remove_command('help')
-    
+        self.commands_ran = 0
+
     async def on_message(self, ctx):
         self.messages_seen += 1
         await self.process_commands(ctx)
+
+    async def on_command(self, ctx):
+        self.commands_ran +=1
 
     def __del__(self):
         self.loop.set_exception_handler(lambda *args, **kwargs: None)
