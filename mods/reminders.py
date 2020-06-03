@@ -11,6 +11,7 @@ import os
 import asyncio
 import time
 import logging
+import typing
 import utils
 from utils.embed import Embeds
 
@@ -23,7 +24,7 @@ class RemindMe(commands.Cog):
         self.units = {"second" : 1,"minute": 60, "hour": 3600, "day": 86400, "week": 604800, "month": 2592000, "year": 31104000}
 
     @commands.command(pass_context=True)
-    async def remind(self, ctx, who : str=None, quantity : int=None, time_unit : str=None, *, text : str=None):
+    async def remind(self, ctx, who : typing.Union[discord.Member, str], quantity : int, time_unit : str, *, text : str):
         """Sends you <text> when the time is up
         Accepts: minutes, hours, days, weeks, month
         Example:
@@ -31,16 +32,10 @@ class RemindMe(commands.Cog):
         time_unit = time_unit.lower()
         author = ctx.message.author
         s = ""
-        if who:
-            if who == 'me':
-                who = author
-        else:
-            if who[0:2] == "<@" and who[-1] == ">":
-                who = int(re.sub("[^0-9]", "", who))
-                who = self.bot.get_user(who)
-                who = user.name
-        if not who:
+        if who == "me":
             who = author
+        if not who:
+            await ctx.send("Invalid user. Choose a ID, mention, nickname, or say me")
             
         if time_unit.endswith("s"):
             time_unit = time_unit[:-1]
