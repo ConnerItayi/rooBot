@@ -24,7 +24,7 @@ class Info(commands.Cog):
     @commands.command(name='ping',
                 description="Ping!",
                 brief="Ping!",
-                aliases=['Ping', 'Ping!', 'Pong', 'Pong!', 'Latency', 'Test'])
+                aliases=['Ping', 'Ping!', 'Pong', 'Pong!', 'Latency', 'Test', 'test'])
     async def ping(self, ctx):
         emb = Embeds.create_embed(self, ctx, "Bot Latency", None, None)
         latency = str(math.ceil(self.bot.latency * 1000))
@@ -43,6 +43,8 @@ class Info(commands.Cog):
     async def stats(self, ctx):
         ping = math.floor(self.bot.latency * 1000)
         prefix = self.bot.config.prefix
+        if prefix == "":
+            prefix = "None"
         owner = self.bot.appinfo.owner
         info = discord.__version__
         servers = len(self.bot.guilds)
@@ -76,7 +78,7 @@ class Info(commands.Cog):
         embed.add_field(name="Owner", value=owner, inline=True)
         embed.add_field(name="Ping", value=str(ping) + ' ms', inline=True)
         embed.add_field(name="Discord.py version", value=info, inline=True)
-        embed.add_field(name="Bot prefix", value="There is none, just type a command", inline=True)
+        embed.add_field(name="Bot prefix", value=prefix, inline=True)
         embed.add_field(name="Servers", value=servers, inline=True)
         embed.add_field(name="Messages seen", value=messages_seen, inline=True)
         embed.add_field(name="Commands ran", value=commands_ran, inline=True) 
