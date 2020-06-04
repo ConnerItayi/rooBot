@@ -33,8 +33,8 @@ class RemindMe(commands.Cog):
         s = ""
         if who == "me":
             who = author
-        elif who == str and str != who:
-            await ctx.send("Invalid user. Choos; mention, server nickname, id, or use remind me if remindin yourself.")
+        if who ==  str:
+            await ctx.send("Invalid user. Choose; mention, server nickname, id, or use remind me if remindin yourself.")
             return
         if time_unit.endswith("s"):
             time_unit = time_unit[:-1]
