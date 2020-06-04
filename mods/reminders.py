@@ -25,16 +25,17 @@ class RemindMe(commands.Cog):
 
     @commands.command(pass_context=True)
     async def remind(self, ctx, who : typing.Union[discord.Member, str], quantity : int, time_unit : str, *, text : str):
-        """Sends you <text> when the time is up        Accepts: minutes, hours, days, weeks, month
+        """Sends you <text> when the time is up
+        Accepts: minutes, hours, days, weeks, month
         Example:
         remind me 3 days Have sushi with Asu and JennJenn"""
         time_unit = time_unit.lower()
         author = ctx.message.author
         s = ""
-        if who == "me":
+        if who == "me" or who == 'myself':
             who = author
-        if type(who) ==  str:
-            await ctx.send("Invalid user. Choose; mention, server nickname, id, or use remind me if remindin yourself.")
+        elif type(who) ==  str:
+            await ctx.send("Invalid user. Choose; mention, server nickname, id, or use remind me/myself if remindin yourself.")
             return
         if time_unit.endswith("s"):
             time_unit = time_unit[:-1]
