@@ -63,22 +63,22 @@ class RemindMe(commands.Cog):
         author = ctx.message.author
         to_remove = []
         if target:
-            for a, reminder in enumerate(self.reminders, 1):
-                if target == a and reminder["AUTHOR"] == ctx.message.author.id:
-                    to_remove.append(reminder)
+            for a, b in enumerate(self.reminders, 1):
+                if b["AUTHOR"] == author.id and target == a:
+                    to_remove.append(b)
         else:
-            for reminder in self.reminders:
-                if reminder["AUTHOR"] == ctx.message.author.id:
-                    to_remove.append(reminder)
+            for b in self.reminders:
+                if b["AUTHOR"] == ctx.message.author.id:
+                    to_remove.append(b)
 
         if not to_remove == []:
-            for reminder in to_remove:
-                self.reminders.remove(reminder)
+            for b in to_remove:
+                self.reminders.remove(b)
             fileIO("data/reminders.json", "save", self.reminders)
             if not target:
                 await ctx.send("All your notifications have been removed.")
             else:
-                await ctx.send("{} has been removed from your reminders".format(target))
+                await ctx.send("{} has been removed from your reminders".format(b["TEXT"]))
         else:
             await ctx.send("You don't have any upcoming notification.")
 
