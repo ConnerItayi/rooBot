@@ -11,6 +11,7 @@ import os
 import asyncio
 import time
 import logging
+import typing
 import utils
 from utils.embed import Embeds
 
@@ -23,7 +24,7 @@ class RemindMe(commands.Cog):
         self.units = {"second" : 1,"minute": 60, "hour": 3600, "day": 86400, "week": 604800, "month": 2592000, "year": 31104000}
 
     @commands.command(pass_context=True)
-    async def remind(self, ctx, who : str=None, quantity : int=None, time_unit : str=None, *, text : str=None):
+    async def remind(self, ctx, who : typing.Union[discord.Member, str], quantity : int, time_unit : str, *, text : str):
         """Sends you <text> when the time is up
         Accepts: minutes, hours, days, weeks, month
         Example:
@@ -31,17 +32,11 @@ class RemindMe(commands.Cog):
         time_unit = time_unit.lower()
         author = ctx.message.author
         s = ""
-        if who:
-            if who == 'me':
-                who = author
-        else:
-            if who[0:2] == "<@" and who[-1] == ">":
-                who = int(re.sub("[^0-9]", "", who))
-                who = self.bot.get_user(who)
-                who = user.name
-        if not who:
+        if who == "me" or who == 'myself':
             who = author
-            
+        elif type(who) ==  str:
+            await ctx.send("Invalid user. Choose; mention, server nickname, id, or use remind me/myself if reminding yourself.")
+            return
         if time_unit.endswith("s"):
             time_unit = time_unit[:-1]
             s = "s"
@@ -68,22 +63,22 @@ class RemindMe(commands.Cog):
         author = ctx.message.author
         to_remove = []
         if target:
-            for a, reminder in enumerate(self.reminders, 1):
-                if target == a and reminder["AUTHOR"] == ctx.message.author.id:
-                    to_remove.append(reminder)
+            for a, b in enumerate(self.reminders, 1):
+                if b["AUTHOR"] == author.id and target == a:
+                    to_remove.append(b)
         else:
-            for reminder in self.reminders:
-                if reminder["AUTHOR"] == ctx.message.author.id:
-                    to_remove.append(reminder)
+            for b in self.reminders:
+                if b["AUTHOR"] == ctx.message.author.id:
+                    to_remove.append(b)
 
         if not to_remove == []:
-            for reminder in to_remove:
-                self.reminders.remove(reminder)
+            for b in to_remove:
+                self.reminders.remove(b)
             fileIO("data/reminders.json", "save", self.reminders)
             if not target:
                 await ctx.send("All your notifications have been removed.")
             else:
-                await ctx.send("{} has been removed from your reminders".format(target))
+                await ctx.send("{} has been removed from your reminders".format(b["TEXT"]))
         else:
             await ctx.send("You don't have any upcoming notification.")
 
